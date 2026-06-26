@@ -1,38 +1,47 @@
-# ENTORNO DE INSTALACIONES MEP: CALCULADORA DE DESHUMECTACIÓN Y TÉRMICA DE PISCINAS
-**ID_INFORME:** ITR.CDP_260626-01 | **VERSIÓN:** 1.3  
-**ESTADO:** ACEPTADO E IMPLEMENTADO
+**Este es el archivo `README.md` principal (*root*) para el repositorio global de utilidades y aplicaciones MEP. Está estructurado de manera fucinal, sirviendo como índice unificado para los diferentes módulos que se van desarrollando.**
 
-Este repositorio contiene la herramienta profesional autocontenida para el dimensionado mecánico y de fluidos en piscinas cubiertas climatizadas (natatorios). El aplicativo garantiza una trazabilidad completa desde los requisitos técnicos hasta las ecuaciones aplicadas de balance de masa y energía térmica.
+---
+## 📂 Índice de Aplicaciones y Módulos
 
-## HISTORIAL ACUMULADO DE INFORMES TÉCNICOS (ITR)
-
-### Versión 1.0 - Balance de Masa Básico
-* **Alcance:** Modelado analítico de la carga latente de deshumectación considerando evaporación libre superficial, ocupación y caudal de renovación exterior. Metodología ASHRAE.
-
-### Versión 1.1 - Balance de Energía Térmica
-* **Alcance:** Adición del módulo de transferencia de calor para el agua del vaso. Diferenciación entre la potencia de arranque inicial sensible en función del tiempo y la potencia de mantenimiento continuo (pérdida latente + transmisión).
-
-### Versión 1.2 - Optimización Geométrica y Psicrometría Vectorial
-* **Alcance:** Cálculo automático de volumen ($V = A \cdot h_{vaso}$) y corrección algebraica del aire exterior para evaluar su vector de secado (resta carga si es más seco que el interior, suma si es más húmedo). Integración de motor psicrométrico analítico (Magnus-Tetens).
-
-### Versión 1.3 - Estándar VDI 2089 y Free-Drying (Versión Actual)
-* **Cambio Evaporativo:** Implementación de la norma alemana VDI 2089. La evaporación se calcula en base al salto de humedad absoluta en g/kg y coeficientes de agitación $\beta$ (0.5 a 4.0):
-  $\dot{m}_e = \beta \cdot A \cdot (x_{sup} - x_{int}) \cdot \frac{1}{1000}$
-* **Módulo Free-Drying:** Adición del cálculo de caudal de aire exterior necesario si la estrategia de deshumectación es 100% aire exterior (sin ciclo frigorífico cerrado):
-  $V_{ae} = \frac{v_e \cdot m_{req}}{W_{ai} - W_{ae}}$
-  *(Con evaluación lógica de viabilidad física si el aire exterior es demasiado húmedo).*
+* [APP cálculo HS5: Pozo Bombeo Saneamiento ](./APP_1.Cal.PB_SAN/)
+* [APP cálculo HS1: Pozo Bombeo Nivel Freático](./APP_2.Calc.PB_NF/)
+* [APP Cálculo Curva Bombas](./APP_3.Calc_B.HID_Multiples/)
+* [APP Cálculo Caudales AA para refrigeración](./APP_4.Calc.Caudales-AA/)
+* [APP Cálculo Hidráulico Piscinas](./APP_5.Calc.HID_Piscinas/)
+* [APP Cálculo Hidráulico Piscinas Full con información](./APP_5.1.Calc.HID_Piscina_Full/)
+* [APP Cálculo SUA8: Necesidad Pararrayos](./APP_6.Calc.SUA8_Pararrayos/)
+* [APP Cálculo Deshumectación Piscina](./APP_7.Calc.DESH_Piscina/)
 
 ---
 
-## BITÁCORA DE CAMBIOS (CHANGELOG)
-* **v1.0 (26/06/2026):** Definición de variables base y factores de actividad de ASHRAE.
-* **v1.1 (26/06/2026):** Interconexión evaporación-pérdida térmica latente y balance de placas térmicas.
-* **v1.2 (26/06/2026):** Refactorización del balance psicrométrico y automatización de volumen del vaso.
-* **v1.3 (26/06/2026):** Migración del cálculo de evaporación a VDI 2089 e inclusión del caudal volumétrico $V_{ae}$ para sistemas All-Air (Todo Aire).
+# MEP & Hydraulic Engineering Suite
+
+Este repositorio centraliza un conjunto de aplicaciones e instrumentos técnicos interactivos orientados al **cálculo, dimensionado preliminar y supervisión visual de instalaciones integrales**.
+
+Todas las aplicaciones se ejecutan bajo una arquitectura **Client-Side pura (CSR)**, lo que garantiza privacidad absoluta de los datos, agilidad y despliegue inmediato sin dependencias de servidor ni bases de datos.
 
 ---
 
-## STACK TECNOLÓGICO
-* **Frontend:** HTML5 Semántico y CSS3 con optimización Report-Ready (A4 Print).
-* **Lógica:** JavaScript ES6 Nativo (Vanilla JS). Motor termodinámico propio.
-* **Renderizado Matemático:** MathJax v3 para justificación formal en LaTeX.
+## 🛠️ Stack Tecnológico Común
+
+Las herramientas de este ecosistema comparten una filosofía de desarrollo ágil y ligera:
+
+* **Lógica Core:** JavaScript Vanilla (ES6+) sin frameworks ni sobrecargas de procesamiento. Cálculos deterministas y matrices estáticas de componentes comerciales.
+* **UI/UX:** HTML5 semántico y CSS3 avanzado utilizando maquetaciones fluidas (`CSS Grid` / `Flexbox`) con sistemas de variables nativas para interfaces en Modo Oscuro de alta fidelidad.
+* **Gráficos e Infografías:** Motores ligeros como `Chart.js` y `Mermaid.js` acoplados directamente en el flujo del cliente.
+* **Reportes:** Directivas estricta de CSS `@media print` para la supresión de elementos interactivos de la UI en la generación de memorias técnicas en papel o PDF.
+
+---
+
+## 🚀 Despliegue Local Inmediato
+
+Al no contar con dependencias de servidor ni procesos de compilación (`Webpack`, `Vite`, etc.), puedes ejecutar cualquiera de las herramientas de forma local:
+
+1. Clonar el repositorio completo:
+```bash
+git clone https://github.com/tu-usuario/tu-repositorio-mep.git
+
+```
+2. Ejecutar directamente abriendo el archivo `.html` deseado en cualquier navegador moderno con soporte ES6.
+
+---
