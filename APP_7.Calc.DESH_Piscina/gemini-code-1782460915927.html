@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora MEP - Deshumectación y Térmica de Piscinas</title>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --elecnor-blue: #004687;
+            --elecnor-orange: #FF8200;
+            --bg-accent: #FFF8F2;
+            --dark-text: #333333;
+            --light-bg: #f8f9fa;
+            --border-color: #cccccc;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 1.6; color: var(--dark-text); margin: 0; background-color: #e9ecef; }
+        .navbar { background-color: var(--elecnor-blue); color: white; padding: 15px 20px; display: flex; justify-content: space-between; border-bottom: 4px solid var(--elecnor-orange); }
+        .navbar h1 { margin: 0; font-size: 1.3rem; text-transform: uppercase; }
+        .nav-tabs { display: flex; background: #ffffff; border-bottom: 2px solid var(--border-color); margin: 0; padding: 0; list-style: none; }
+        .tab-link { padding: 12px 24px; cursor: pointer; font-weight: bold; color: var(--elecnor-blue); border-right: 1px solid #eee; transition: all 0.2s; }
+        .tab-link:hover { background-color: #f1f1f1; }
+        .tab-link.active { background-color: var(--elecnor-blue); color: white; border-bottom: 3px solid var(--elecnor-orange); }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .tab-content { display: none; background: white; padding: 30px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        fieldset { border: 1px solid var(--border-color); border-radius: 6px; padding: 20px; margin-bottom: 20px; background-color: var(--light-bg); }
+        legend { font-weight: bold; color: var(--elecnor-blue); padding: 0 10px; font-size: 1.1rem; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.95rem; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: var(--elecnor-orange); box-shadow: 0 0 5px rgba(255,130,0,0.2); }
+        .results-box { background-color: var(--bg-accent); border: 2px solid var(--elecnor-orange); border-radius: 6px; padding: 20px; position: sticky; top: 20px; }
+        .results-box h3 { margin-top: 0; color: var(--elecnor-blue); border-bottom: 2px solid var(--elecnor-orange); padding-bottom: 10px; }
+        .formula-display { background: #ffffff; padding: 12px; border-left: 4px solid var(--elecnor-blue); margin: 10px 0; font-family: monospace; overflow-x: auto; font-size: 0.95rem; }
+        .result-highlight { display: flex; justify-content: space-between; background: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; font-weight: bold; }
+        .val-total { font-size: 1.2rem; color: var(--elecnor-orange); }
+        .val-blue { color: var(--elecnor-blue); }
+        .btn-print { background-color: var(--elecnor-orange); color: white; border: none; padding: 12px 25px; font-size: 1rem; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 20px; }
+        .document-page { max-width: 210mm; margin: 0 auto; background: white; padding: 20mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-top: 10px solid var(--elecnor-blue); box-sizing: border-box; }
+        .report-title { color: var(--elecnor-blue); font-size: 18pt; text-align: center; text-transform: uppercase; margin-bottom: 20px; border-bottom: 2px solid var(--elecnor-orange); padding-bottom: 10px;}
+        .report-section { margin-top: 25px; }
+        .report-section h4 { color: var(--elecnor-blue); border-left: 5px solid var(--elecnor-orange); padding-left: 10px; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+        th { background: var(--elecnor-blue); color: white; padding: 8px; text-align: left; }
+        td { border: 1px solid var(--border-color); padding: 8px; }
+        @media print {
+            body { background: none; color: #000; }
+            .navbar, .nav-tabs, .btn-print, #calc-tab, #doc-tab { display: none !important; }
+            #report-tab { display: block !important; padding: 0 !important; }
+            .document-page { box-shadow: none; border-top: none; padding: 0; margin: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <h1>Módulo MEP - Deshumectación y Térmica de Piscinas</h1>
+        <div style="font-size: 0.85rem; font-weight: bold;">v1.1 | ITR.CDP_260626-01</div>
+    </div>
+
+    <ul class="nav-tabs">
+        <li class="tab-link active" onclick="switchTab(event, 'calc-tab')">Panel de Cálculo</li>
+        <li class="tab-link" onclick="switchTab(event, 'report-tab')">Informe Técnico</li>
+        <li class="tab-link" onclick="switchTab(event, 'doc-tab')">Bases de Cálculo</li>
+    </ul>
+
+    <div class="container">
+        
+        <div id="calc-tab" class="tab-content active">
+            <div class="grid-2">
+                <div>
+                    <fieldset>
+                        <legend>1. Parámetros del Recinto y Lámina de Agua</legend>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Superficie Agua (A) [m²]:</label><input type="number" id="inp_A" class="form-control calc-trigger" value="33" step="1"></div>
+                            <div class="form-group"><label>Volumen Vaso (V) [m³]:</label><input type="number" id="inp_V" class="form-control calc-trigger" value="46.2" step="0.1"></div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Tª Agua (Tw) [ºC]:</label><input type="number" id="inp_Tw" class="form-control calc-trigger" value="28" step="0.5"></div>
+                            <div class="form-group"><label>Tª Aire Interior (Tint) [ºC]:</label><input type="number" id="inp_Tint" class="form-control calc-trigger" value="30" step="0.5"></div>
+                        </div>
+                        <div class="form-group"><label>Humedad Rel. Interior (HRint) [%]:</label><input type="number" id="inp_HRint" class="form-control calc-trigger" value="60" step="1"></div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>2. Ocupación y Ventilación</legend>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Ocupantes Máximos:</label><input type="number" id="inp_N" class="form-control calc-trigger" value="12" step="1"></div>
+                            <div class="form-group">
+                                <label>Factor Actividad (F):</label>
+                                <select id="inp_F" class="form-control calc-trigger">
+                                    <option value="0.05">Piscina inactiva / Cubierta (0.05)</option>
+                                    <option value="0.10">Uso estándar medio (0.10)</option>
+                                    <option value="0.12" selected>Uso recreativo / SPA (0.12)</option>
+                                    <option value="0.15">Actividad intensa / Olas (0.15)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Caudal Ventilación Exterior (Qv) [m³/h]:</label><input type="number" id="inp_Qv" class="form-control calc-trigger" value="4000" step="100"></div>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Tª Aire Exterior (Text) [ºC]:</label><input type="number" id="inp_Text" class="form-control calc-trigger" value="30" step="0.5"></div>
+                            <div class="form-group"><label>HR Exterior (HRext) [%]:</label><input type="number" id="inp_HRext" class="form-control calc-trigger" value="50" step="1"></div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>3. Parámetros Térmicos del Vaso</legend>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Tª Agua Red/Llenado [ºC]:</label><input type="number" id="inp_Tred" class="form-control calc-trigger" value="13" step="1"></div>
+                            <div class="form-group">
+                                <label>Tiempo de Calentamiento (t):</label>
+                                <select id="inp_tcal" class="form-control calc-trigger">
+                                    <option value="6">6 horas (Rápido)</option>
+                                    <option value="12">12 horas</option>
+                                    <option value="24" selected>24 horas (Estándar)</option>
+                                    <option value="48">48 horas (Lento)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Pérdidas Extras (Transmisión cerramientos) [kW]:</label><input type="number" id="inp_Pextras" class="form-control calc-trigger" value="3.0" step="0.5"></div>
+                        <div class="form-group"><label>Margen Seguridad General [%]:</label><input type="number" id="inp_Margen" class="form-control calc-trigger" value="20" step="5"></div>
+                    </fieldset>
+                </div>
+
+                <div>
+                    <div class="results-box">
+                        <h3>Módulo 1: Carga Latente (Deshumectadora)</h3>
+                        <div class="result-highlight"><span>Evaporación Vaso:</span><span id="out_me" class="val-blue">0.0 kg/h</span></div>
+                        <div class="result-highlight"><span>Ocupación:</span><span id="out_mp" class="val-blue">0.0 kg/h</span></div>
+                        <div class="result-highlight"><span>Ventilación Exterior:</span><span id="out_mv" class="val-blue">0.0 kg/h</span></div>
+                        <div class="result-highlight" style="border-left: 5px solid var(--elecnor-orange); background: #fff3cd;">
+                            <span>CARGA TOTAL (+ Margen):</span><span id="out_mtotal" class="val-total">0.0 kg/h</span>
+                        </div>
+                        <div id="form_deshum" class="formula-display">Calculando...</div>
+
+                        <h3 style="margin-top:25px;">Módulo 2: Potencia Térmica Vaso (Intercambiador)</h3>
+                        <div class="result-highlight"><span>Potencia Mantenimiento (Evap + Extras):</span><span id="out_pmaint" class="val-blue">0.0 kW</span></div>
+                        <div class="result-highlight" style="border-left: 5px solid var(--elecnor-orange); background: #fff3cd;">
+                            <span>POTENCIA DE ARRANQUE INICIAL:</span><span id="out_parranque" class="val-total">0.0 kW</span>
+                        </div>
+                        <div id="form_term" class="formula-display">Calculando...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="report-tab" class="tab-content">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir Memoria Justificativa</button>
+            <div class="document-page">
+                <div style="display:flex; justify-content:space-between; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px;">
+                    <div><strong>INGENIERÍA MEP</strong><br><small>Herramienta Homologada RITE/ASHRAE</small></div>
+                    <div style="text-align: right;"><small>Fecha: <span id="r_date"></span></small><br><small>Ref: CDP-v1.1</small></div>
+                </div>
+                
+                <div class="report-title">Memoria de Cálculo: Climatización y Calentamiento de Piscina Cubierta</div>
+
+                <div class="report-section">
+                    <h4>1. Resumen de Condiciones de Diseño</h4>
+                    <table>
+                        <tr>
+                            <th>Parámetros Geométricos</th>
+                            <td>Superficie Vaso: <span id="r_A"></span> m²</td>
+                            <td>Volumen Vaso: <span id="r_V"></span> m³</td>
+                        </tr>
+                        <tr>
+                            <th>Condiciones Interiores</th>
+                            <td>Tª Aire: <span id="r_Tint"></span> ºC / Tª Agua: <span id="r_Tw"></span> ºC</td>
+                            <td>HR Interior: <span id="r_HRint"></span>%</td>
+                        </tr>
+                        <tr>
+                            <th>Condiciones Exteriores</th>
+                            <td>Tª Exterior: <span id="r_Text"></span> ºC</td>
+                            <td>HR Exterior: <span id="r_HRext"></span>%</td>
+                        </tr>
+                        <tr>
+                            <th>Uso y Ventilación</th>
+                            <td>Caudal Ext: <span id="r_Qv"></span> m³/h</td>
+                            <td>Ocupación: <span id="r_N"></span> pax (Factor F: <span id="r_F"></span>)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="report-section">
+                    <h4>2. Análisis Psicrométrico (Propiedades del Aire)</h4>
+                    <p>Cálculo de la presión de vapor de saturación mediante fórmula de Magnus-Tetens y determinación de humedades absolutas:</p>
+                    <div id="r_form_psic"></div>
+                </div>
+
+                <div class="report-section">
+                    <h4>3. Justificación de Carga Latente (Deshumectación)</h4>
+                    <table>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Fórmula Aplicada</th>
+                            <th>Aporte Latente</th>
+                        </tr>
+                        <tr>
+                            <td>Evaporación (${\dot{m}_e}$)</td>
+                            <td id="r_eq_me"></td>
+                            <td><strong><span id="r_res_me"></span> kg/h</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Ocupantes (${\dot{m}_p}$)</td>
+                            <td id="r_eq_mp"></td>
+                            <td><strong><span id="r_res_mp"></span> kg/h</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Ventilación (${\dot{m}_v}$)</td>
+                            <td id="r_eq_mv"></td>
+                            <td><strong><span id="r_res_mv"></span> kg/h</strong></td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <th colspan="2" style="text-align:right; color:black; background:none;">TOTAL DISEÑO (Incluyendo Margen <span id="r_margen"></span>%)</th>
+                            <td><strong style="font-size:1.1rem; color:#004687;"><span id="r_res_mtotal"></span> kg/h</strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="report-section">
+                    <h4>4. Justificación de Potencia Térmica del Vaso</h4>
+                    <p>Balance energético para calentamiento del volumen total ($\Delta T = <span id="r_DT"></span>^\circ C$) y mantenimiento frente a disipación latente.</p>
+                    <div id="r_form_term"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="doc-tab" class="tab-content">
+            <h3>Bases de Cálculo Normativas</h3>
+            <p>La herramienta aplica las directrices combinadas de <strong>ASHRAE</strong> y <strong>VDI 2089</strong> para dimensionamiento de instalaciones mecánicas en natatorios cubiertos.</p>
+            <ul>
+                <li><strong>Presión de Saturación ($P_{sat}$):</strong> Ecuación de Magnus-Tetens en kPa.</li>
+                <li><strong>Humedad Absoluta ($x$):</strong> $x = 0.622 \cdot P_a / (P_{atm} - P_a)$.</li>
+                <li><strong>Evaporación:</strong> Depende críticamente del diferencial de presiones de vapor entre la superficie del agua saturada y el ambiente interior, corregido por el factor empírico de agitación $F$.</li>
+                <li><strong>Ventilación Exterior:</strong> Si la humedad absoluta exterior es superior a la interior, el aire de renovación aporta carga latente. Si es inferior, la ventilación asiste en la deshumectación. Por criterio conservador, si asiste, se contabiliza como 0 kg/h en el sumatorio máximo de diseño.</li>
+                <li><strong>Pérdida Térmica Latente:</strong> Aproximación técnica estándar de 0.68 kWh por cada kg de agua evaporada.</li>
+                <li><strong>Potencia de Arranque:</strong> Calor sensible puro $Q = m \cdot c_p \cdot \Delta T$ dividido entre las horas de puesta en régimen concedidas al diseño.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Psychrometric function (Magnus-Tetens)
+        function calcAirProps(T, HR) {
+            const Psat = 0.6112 * Math.exp((17.67 * T) / (T + 243.5)); // kPa
+            const Pa = Psat * (HR / 100);
+            const Patm = 101.325; // Nivel del mar
+            const x = 0.622 * (Pa / (Patm - Pa)); // kg/kg
+            return { Psat, Pa, x };
+        }
+
+        function computeMEP() {
+            // Inputs Latente
+            const A = parseFloat(document.getElementById('inp_A').value) || 0;
+            const V = parseFloat(document.getElementById('inp_V').value) || 0;
+            const Tw = parseFloat(document.getElementById('inp_Tw').value) || 0;
+            const Tint = parseFloat(document.getElementById('inp_Tint').value) || 0;
+            const HRint = parseFloat(document.getElementById('inp_HRint').value) || 0;
+            const N = parseFloat(document.getElementById('inp_N').value) || 0;
+            const F = parseFloat(document.getElementById('inp_F').value) || 0;
+            const Qv = parseFloat(document.getElementById('inp_Qv').value) || 0;
+            const Text = parseFloat(document.getElementById('inp_Text').value) || 0;
+            const HRext = parseFloat(document.getElementById('inp_HRext').value) || 0;
+            
+            // Inputs Térmicos
+            const Tred = parseFloat(document.getElementById('inp_Tred').value) || 0;
+            const tcal = parseFloat(document.getElementById('inp_tcal').value) || 24;
+            const Pextras = parseFloat(document.getElementById('inp_Pextras').value) || 0;
+            const Margen = parseFloat(document.getElementById('inp_Margen').value) || 0;
+
+            // --- Cálculos Psicrométricos ---
+            const propsWater = calcAirProps(Tw, 100); // Agua asume saturación 100% a su Tª
+            const propsInt = calcAirProps(Tint, HRint);
+            const propsExt = calcAirProps(Text, HRext);
+
+            // 1. Evaporación (ASHRAE)
+            let me = A * (propsWater.Psat - propsInt.Pa) * F;
+            if (me < 0) me = 0; // Condensación no evaluada como carga
+
+            // 2. Ocupación
+            const mp = N * 0.15;
+
+            // 3. Ventilación (Densidad aprox 1.2 kg/m³)
+            const deltaX = propsExt.x - propsInt.x; // kg agua / kg aire sec
+            let mv = Qv * 1.2 * deltaX;
+            let carga_mv = mv > 0 ? mv : 0; // Solo carga si exterior es más húmedo
+
+            // Carga Total Latente
+            const mTotal = (me + mp + carga_mv) * (1 + Margen/100);
+
+            // --- Cálculos Térmicos ---
+            const deltaT_agua = Tw - Tred;
+            const Qini = V * 1.16 * deltaT_agua; // kWh
+            const Parranque = tcal > 0 ? Qini / tcal : 0; // kW
+            
+            const Pevap = me * 0.68; // kW
+            const Pmaint = Pevap + Pextras;
+
+            // --- Actualización DOM UI (Panel) ---
+            document.getElementById('out_me').textContent = me.toFixed(2) + " kg/h";
+            document.getElementById('out_mp').textContent = mp.toFixed(2) + " kg/h";
+            document.getElementById('out_mv').textContent = (mv > 0 ? "+" : "") + mv.toFixed(2) + " kg/h";
+            document.getElementById('out_mtotal').textContent = mTotal.toFixed(1) + " kg/h";
+
+            document.getElementById('out_pmaint').textContent = Pmaint.toFixed(1) + " kW";
+            document.getElementById('out_parranque').textContent = Parranque.toFixed(1) + " kW";
+
+            document.getElementById('form_deshum').innerHTML = 
+                `$$\\dot{m}_{total} = (${me.toFixed(1)} + ${mp.toFixed(1)} + ${carga_mv.toFixed(1)}) \\cdot 1.${Margen} = ${mTotal.toFixed(1)} \\text{ kg/h}$$`;
+            
+            document.getElementById('form_term').innerHTML = 
+                `$$Q_{ini} = ${V}\\text{ m}^3 \\cdot 1.16 \\cdot (${Tw} - ${Tred}) = ${Qini.toFixed(0)}\\text{ kWh} \\implies P_{arr} = \\frac{${Qini.toFixed(0)}}{${tcal}\\text{h}} = ${Parranque.toFixed(1)}\\text{ kW}$$`;
+
+            // --- Actualización Informe Justificativo ---
+            const today = new Date();
+            document.getElementById('r_date').textContent = today.toLocaleDateString();
+            
+            document.getElementById('r_A').textContent = A; document.getElementById('r_V').textContent = V;
+            document.getElementById('r_Tint').textContent = Tint; document.getElementById('r_Tw').textContent = Tw;
+            document.getElementById('r_HRint').textContent = HRint;
+            document.getElementById('r_Text').textContent = Text; document.getElementById('r_HRext').textContent = HRext;
+            document.getElementById('r_Qv').textContent = Qv;
+            document.getElementById('r_N').textContent = N; document.getElementById('r_F').textContent = F;
+            document.getElementById('r_margen').textContent = Margen;
+            document.getElementById('r_DT').textContent = deltaT_agua;
+
+            document.getElementById('r_form_psic').innerHTML = 
+                `$$P_{w} (\\text{Agua a } ${Tw}^\\circ\\text{C}) = ${propsWater.Psat.toFixed(3)}\\text{ kPa}$$
+                 $$P_{a,int} (\\text{Aire } ${Tint}^\\circ\\text{C, } ${HRint}\\%) = ${propsInt.Pa.toFixed(3)}\\text{ kPa} \\implies x_{int} = ${(propsInt.x*1000).toFixed(1)}\\text{ g/kg}$$
+                 $$x_{ext} (\\text{Aire } ${Text}^\\circ\\text{C, } ${HRext}\\%) = ${(propsExt.x*1000).toFixed(1)}\\text{ g/kg}$$`;
+
+            document.getElementById('r_eq_me').innerHTML = `$$${A} \\cdot (${propsWater.Psat.toFixed(3)} - ${propsInt.Pa.toFixed(3)}) \\cdot ${F}$$`;
+            document.getElementById('r_res_me').textContent = me.toFixed(2);
+            document.getElementById('r_eq_mp').innerHTML = `$$${N} \\cdot 0.15$$`;
+            document.getElementById('r_res_mp').textContent = mp.toFixed(2);
+            
+            if(mv > 0) {
+                document.getElementById('r_eq_mv').innerHTML = `$$${Qv} \\cdot 1.2 \\cdot (${propsExt.x.toFixed(4)} - ${propsInt.x.toFixed(4)})$$`;
+                document.getElementById('r_res_mv').textContent = mv.toFixed(2);
+            } else {
+                document.getElementById('r_eq_mv').innerHTML = `El aire exterior es más seco ($x_{ext} < x_{int}$). Aporta 0 kg/h de diseño.`;
+                document.getElementById('r_res_mv').textContent = "0.00";
+            }
+            
+            document.getElementById('r_res_mtotal').textContent = mTotal.toFixed(1);
+
+            document.getElementById('r_form_term').innerHTML = 
+                `$$P_{arranque} = \\frac{${V} \\cdot 1.16 \\cdot (${Tw} - ${Tred})}{${tcal}} = \\mathbf{${Parranque.toFixed(1)} \\text{ kW}}$$
+                 $$P_{maint} = (${me.toFixed(2)}\\text{ kg/h} \\cdot 0.68\\text{ kWh/kg}) + ${Pextras}\\text{ kW}_{trans} = \\mathbf{${Pmaint.toFixed(1)} \\text{ kW}}$$`;
+
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Add event listeners to all triggers
+        document.querySelectorAll('.calc-trigger').forEach(input => {
+            input.addEventListener('input', computeMEP);
+            input.addEventListener('change', computeMEP);
+        });
+
+        // Init
+        window.onload = computeMEP;
+    </script>
+</body>
+</html>
